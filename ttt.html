@@ -1,0 +1,307 @@
+<!--
+CREDITS: https://reactjs.org/tutorial/tutorial.html
+Adapted for MDP based Tic Tac Toe by @revanurambareesh
+
+Following code is hacked to include learnt MDP policy to play the game. 
+-->
+
+<html>
+<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Exo+2" rel="stylesheet"/>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css"> 
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="10000000policy.js" type="text/javascript">
+  console.log(policy)
+</script>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+body {
+  font: 14px "Exo 2", Futura, sans-serif;
+  margin: 20px;
+}
+
+ol, ul {
+  padding-left: 30px;
+}
+
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.status {
+  margin-bottom: 10px;
+  font: 25px "Exo 2", Futura, sans-serif;
+
+}
+
+.square {
+  font-family: "Exo 2", Futura, sans-serif;
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 75px;
+  font-weight: bold;
+  line-height: 150px;
+  height: 150px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 150px;
+}
+
+.square:focus {
+  outline: none;
+}
+
+.kbd-navigation .square:focus {
+  background: #ddd;
+}
+
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-info {
+  margin-left: 200px;
+}
+
+.play-again {
+  margin-left: 160px;
+  margin-top: 20px;
+}
+
+a {
+     color:#8c3;
+   }
+
+</style>
+
+<div id="errors" style="
+  background: #c00;
+  color: #fff;
+  display: none;
+  margin: -20px -20px 20px;
+  padding: 20px;
+  white-space: pre-wrap;
+"></div>
+<h1>Markov Decision Process for learning Tic Tac Toe</h1>
+<div>
+  <br/>
+    <span >
+      <a href="https://ambareeshr.wordpress.com/" class="btn btn-lg btn-outline" target="_blank">
+        <i class="fa fa-wordpress" style="line-height: 1.5; font-size: 1.25em;color: #666;">
+          <br/><p style="align:center;font-size:15px;padding:1px;font-family:'Exo 2'">Blog</p>
+        </i> 
+      </a>
+    </span>
+    <span class="skills text-center">
+    <a href="https://github.com/revanurambareesh" class="btn btn-lg btn-outline" target="_blank">
+      <i class="fa fa-github" style="line-height: 1.5; font-size: 1.25em;color: #666;"">
+        <br/><p style="align:center;font-size:15px;padding:3px;font-family:'Exo 2'">Code</p>
+      </i> 
+    </a>
+  </span>
+</div>
+<div id="root"></div>
+<script>
+window.addEventListener('mousedown', function(e) {
+  document.body.classList.add('mouse-navigation');
+  document.body.classList.remove('kbd-navigation');
+});
+window.addEventListener('keydown', function(e) {
+  if (e.keyCode === 9) {
+    document.body.classList.add('kbd-navigation');
+    document.body.classList.remove('mouse-navigation');
+  }
+});
+window.addEventListener('click', function(e) {
+  if (e.target.tagName === 'A' && e.target.getAttribute('href') === '#') {
+    e.preventDefault();
+  }
+});
+window.onerror = function(message, source, line, col, error) {
+  var text = error ? error.stack || error : message + ' (at ' + source + ':' + line + ':' + col + ')';
+  errors.textContent += text + '\n';
+  errors.style.display = '';
+};
+console.error = (function(old) {
+  return function error() {
+    errors.textContent += Array.prototype.slice.call(arguments).join(' ') + '\n';
+    errors.style.display = '';
+    old.apply(this, arguments);
+  }
+})(console.error);
+</script>
+
+<script type="text/babel">
+  var compIsX = false
+  function Square(props) {
+  return (
+    <button className="square" onClick={props.onClick}>
+      {props.value}</button>
+    );
+}
+
+class Board extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      squares: Array(9).fill(null),
+      xIsNext: true,
+      human: !compIsX
+    };
+  }
+
+  handleClick(i) {
+    const squares = this.state.squares.slice();
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    this.setState({
+      squares: squares,
+      xIsNext: !this.state.xIsNext,
+      human: true
+    });
+  }
+
+  renderSquare(i) {
+    return (
+      <Square
+        value={this.state.squares[i]}
+        onClick={() => this.handleClick(i)}
+      />
+    );
+  }
+
+  render() {
+  if(this.props.restart){this.props.restart="";this.setState({
+      squares: Array(9).fill(null),
+      xIsNext: true, 
+      human: !compIsX}); }
+
+    const winner = calculateWinner(this.state.squares);
+    let status;
+    if (winner) {
+      status = 'Winner: ' + winner;
+    } else {
+      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+      var sqrs = this.state.squares;
+      var str = sqrs.map(function(item) { return item == null ? '-' : item; });
+      str = str.toString().replace(/,/g, "").toLowerCase()
+      if((this.state.xIsNext && compIsX) || (!this.state.xIsNext && !compIsX) ) 
+      {
+        console.log(policy[str])
+        this.handleClick(policy[str])
+      }
+    }
+
+    return (
+      <div>
+        <div className="status">{status}</div>
+        <div className="board-row">
+          {this.renderSquare(0)}
+          {this.renderSquare(1)}
+          {this.renderSquare(2)}
+        </div>
+        <div className="board-row">
+          {this.renderSquare(3)}
+          {this.renderSquare(4)}
+          {this.renderSquare(5)}
+        </div>
+        <div className="board-row">
+          {this.renderSquare(6)}
+          {this.renderSquare(7)}
+          {this.renderSquare(8)}
+        </div>
+      </div>
+    );
+  }
+}
+
+class Game extends React.Component {
+  render() {
+  var init_state=Array(9).fill(null)
+    return (
+      <div className="game">
+        <div className="game-board">
+          <Board restart="true" />
+        </div>
+        <div className="game-info">
+          <div>{/* status */}</div>
+          <ol>{/* TODO */}</ol>
+        </div>
+      </div>
+    );
+  }
+}
+
+// ========================================
+
+function whoPlays() {
+  compIsX = document.getElementById("checkBox").checked
+  playAgain()
+  playAgain()
+}
+
+function playAgain(){
+  ReactDOM.render(
+    <Game />,
+    document.getElementById('root')
+  );
+}
+
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
+
+whoPlays()
+</script>
+<button type="button" onclick="playAgain()" class="btn btn-default play-again" >Play New Game</button>
+<br/>
+<label class="checkbox-inline play-again"><input type="checkbox" checked id="checkBox" onclick="whoPlays()">Computer First</label>
+
+
+<footer style="position: fixed;left: 0;bottom: 0;">This code is a hacked version of <a href="https://reactjs.org/tutorial/tutorial.html" target="_blank" >React JS Tutorial</a></footer>
+
+</html>
