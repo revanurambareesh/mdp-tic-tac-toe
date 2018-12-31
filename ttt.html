@@ -9,13 +9,13 @@ Following code is hacked to include learnt MDP policy to play the game.
 <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
-<link href="https://fonts.googleapis.com/css?family=Exo+2" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css?family=Exo+2" rel="stylesheet" />
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css"> 
+<link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css">
 
 <!-- Latest compiled JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -24,18 +24,21 @@ Following code is hacked to include learnt MDP policy to play the game.
 </script>
 
 <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+  crossorigin="anonymous">
 
 <!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+  crossorigin="anonymous">
 
 <!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+  crossorigin="anonymous"></script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <style>
-body {
+  body {
   font: 14px "Exo 2", Futura, sans-serif;
   margin: 20px;
 }
@@ -110,51 +113,53 @@ a {
 "></div>
 <h1>Markov Decision Process for learning Tic Tac Toe</h1>
 <div>
-  <br/>
-    <span >
-      <a href="https://ambareeshr.wordpress.com/" class="btn btn-lg btn-outline" target="_blank">
-        <i class="fa fa-wordpress" style="line-height: 1.5; font-size: 1.25em;color: #666;">
-          <br/><p style="align:center;font-size:15px;padding:1px;font-family:'Exo 2'">Blog</p>
-        </i> 
-      </a>
-    </span>
-    <span class="skills text-center">
+  <br />
+  <span>
+    <a href="https://ambareeshr.wordpress.com/" class="btn btn-lg btn-outline" target="_blank">
+      <i class="fa fa-wordpress" style="line-height: 1.5; font-size: 1.25em;color: #666;">
+        <br />
+        <p style="align:center;font-size:15px;padding:1px;font-family:'Exo 2'">Blog</p>
+      </i>
+    </a>
+  </span>
+  <span class="skills text-center">
     <a href="https://github.com/revanurambareesh" class="btn btn-lg btn-outline" target="_blank">
       <i class="fa fa-github" style="line-height: 1.5; font-size: 1.25em;color: #666;"">
-        <br/><p style="align:center;font-size:15px;padding:3px;font-family:'Exo 2'">Code</p>
-      </i> 
+        <br/><p style="
+        align:center;font-size:15px;padding:3px;font-family:'Exo 2'">Code</p>
+      </i>
     </a>
   </span>
 </div>
 <div id="root"></div>
 <script>
-window.addEventListener('mousedown', function(e) {
-  document.body.classList.add('mouse-navigation');
-  document.body.classList.remove('kbd-navigation');
-});
-window.addEventListener('keydown', function(e) {
-  if (e.keyCode === 9) {
-    document.body.classList.add('kbd-navigation');
-    document.body.classList.remove('mouse-navigation');
-  }
-});
-window.addEventListener('click', function(e) {
-  if (e.target.tagName === 'A' && e.target.getAttribute('href') === '#') {
-    e.preventDefault();
-  }
-});
-window.onerror = function(message, source, line, col, error) {
-  var text = error ? error.stack || error : message + ' (at ' + source + ':' + line + ':' + col + ')';
-  errors.textContent += text + '\n';
-  errors.style.display = '';
-};
-console.error = (function(old) {
-  return function error() {
-    errors.textContent += Array.prototype.slice.call(arguments).join(' ') + '\n';
+  window.addEventListener('mousedown', function (e) {
+    document.body.classList.add('mouse-navigation');
+    document.body.classList.remove('kbd-navigation');
+  });
+  window.addEventListener('keydown', function (e) {
+    if (e.keyCode === 9) {
+      document.body.classList.add('kbd-navigation');
+      document.body.classList.remove('mouse-navigation');
+    }
+  });
+  window.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && e.target.getAttribute('href') === '#') {
+      e.preventDefault();
+    }
+  });
+  window.onerror = function (message, source, line, col, error) {
+    var text = error ? error.stack || error : message + ' (at ' + source + ':' + line + ':' + col + ')';
+    errors.textContent += text + '\n';
     errors.style.display = '';
-    old.apply(this, arguments);
-  }
-})(console.error);
+  };
+  console.error = (function (old) {
+    return function error() {
+      errors.textContent += Array.prototype.slice.call(arguments).join(' ') + '\n';
+      errors.style.display = '';
+      old.apply(this, arguments);
+    }
+  })(console.error);
 </script>
 
 <script type="text/babel">
@@ -297,11 +302,13 @@ function calculateWinner(squares) {
 
 whoPlays()
 </script>
-<button type="button" onclick="playAgain()" class="btn btn-default play-again" >Play New Game</button>
-<br/>
-<label class="checkbox-inline play-again"><input type="checkbox" checked id="checkBox" onclick="whoPlays()">Computer First</label>
+<button type="button" onclick="playAgain()" class="btn btn-default play-again">Play New Game</button>
+<br />
+<label class="checkbox-inline play-again"><input type="checkbox" checked id="checkBox" onclick="whoPlays()">Computer
+  First</label>
 
 
-<footer style="position: fixed;left: 0;bottom: 0;">This code is a hacked version of <a href="https://reactjs.org/tutorial/tutorial.html" target="_blank" >React JS Tutorial</a></footer>
+<footer style="position: fixed;left: 0;bottom: 0;">This code is a hacked version of <a href="https://reactjs.org/tutorial/tutorial.html"
+    target="_blank">React JS Tutorial</a></footer>
 
 </html>
